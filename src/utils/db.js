@@ -1,6 +1,6 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-const connectToDb = () => {
+const connectToDb = async (query) => {
 
     const db = mysql.createPool({
         host: process.env.DB_HOST,
@@ -12,15 +12,14 @@ const connectToDb = () => {
         queueLimit: 0
       });
       
-      db.getConnection((err, connection) => {
-        if (err) {
-          console.error('Error connecting to database: ', err);
-          return;
-        }
-        console.log('Connected to MySQL database!');
-        connection.release();
-      });
-    return db;
+     if(db){
+     console.log("Database connected")
+    //  db.query("SELECT * FROM STUDENTS",(err,res) => {
+    //  console.log(res || err)
+    //  } )
+     }
+     return db
+     
 }
 
 module.exports = {connectToDb};

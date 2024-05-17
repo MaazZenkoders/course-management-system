@@ -5,19 +5,21 @@ const { connectToDb } = require("../utils/db")
 const signup = async (name, email, password,isAdmin) => {
     const tableName = isAdmin? 'teachers': 'students' 
     const pool = connectToDb()
+
+    console.log({pool: (await pool).query(`SELECT * FROM students WHERE email = "bruh@gmail.com"`)});
+
     if (!name || !email || !password) {
         return null;
     }
         try {
-            const existingUser = pool.query(`SELECT * FROM ${tableName} WHERE email = ${email}`);
-            if (existingUser.length > 0) {
-                throw new Error('Email already exists');
+            const existingUser = (await pool).execute(`SELECT * FROM ${tableName} WHERE email=?`,[email])
+            if(existingUser){
+                return null;
             }
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = pool.query(`INSERT INTO ${tableName} (name, email, password) VALUES (${name}, ${email}, ${hashedPassword})`);
-            
-            const token = generateToken(newUser);
-            return {token, newUser}
+            const hashedPassword = await bcrypt.hash(password, 10)
+            const newUser = (await pool).execute(`INSERT INTO ${tableName} (name, email, password) VALUES ('${name}', '${email}', '${hashedPassword}')`)
+            const result = {name,email,password}
+            return (result)
         } catch (error) {
             throw new Error('Error signing up: ' + error.message);
         }
@@ -25,8 +27,29 @@ const signup = async (name, email, password,isAdmin) => {
   
 
 const login = async (email, password) => {
+    const tableName = isAdmin ? 'teachers' : 'students';
+    const pool = connectToDb();
+
     if (!email || !password) {
-        return null;
+        throw new Error('Email and password are required');
+    }
+
+    try {
+        const [rows] = (await pool).execute(`SELECT * FROM ${tableName} WHERE email = ?`, [email]);
+        const existingUser = rows[0];
+
+        if (!existingUser) {
+            throw new Error('Invalid email or password');
+        }
+        const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+        if (!isPasswordValid) {
+            throw new Error('Invalid email or password');
+        }
+
+        const user ={password,email}
+        return(user)
+    } catch (error) {
+        throw new Error('Error logging in: ' + error.message);
     }
 };
 
