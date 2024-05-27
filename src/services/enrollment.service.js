@@ -30,8 +30,8 @@ const getEnrollments = async (course_id) => {
     const [enrollments] = await pool.query(
       "SELECT students.name as studentName, courses.name as courseName, enrollments.* " +
         "FROM enrollments " +
-        "JOIN students ON enrollments.student_id = students.id " +
-        "JOIN courses ON enrollments.course_id = courses.id " +
+        "INNER JOIN students ON enrollments.student_id = students.id " +
+        "INNER JOIN courses ON enrollments.course_id = courses.id " +
         "WHERE courses.id = ?",
       [course_id]
     );
