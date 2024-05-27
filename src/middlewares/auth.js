@@ -6,12 +6,14 @@ const generateToken = (user) => {
     user: {
       id: user.id,
       email: user.email,
+      isAdmin : user.isAdmin
     },
   };
   return jwt.sign(payload, secretKey, { expiresIn: "1h" });
 };
 
 const authorizeTeacher = (req, res, next) => {
+  
   const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {

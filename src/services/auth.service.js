@@ -64,3 +64,4 @@ const login = async (email, password, isAdmin) => {
 };
 
 module.exports = { login, signup };
+

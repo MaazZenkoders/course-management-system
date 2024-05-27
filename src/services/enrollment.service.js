@@ -53,7 +53,7 @@ const deleteEnrollment = async (student_id, course_id) => {
     const [result] = await pool.query(
       "DELETE enrollments " +
         "FROM enrollments " +
-        "JOIN courses ON enrollments.course_id = courses.id " +
+        "INNER JOIN courses ON enrollments.course_id = courses.id " +
         "WHERE enrollments.student_id = ? AND enrollments.course_id = ?",
       [student_id, course_id]
     );
