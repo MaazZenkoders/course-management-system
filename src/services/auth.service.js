@@ -10,21 +10,13 @@ const signup = async (name, email, password, isAdmin) => {
     return null;
   }
   try {
-    const [existingUser] = await pool.query(
-      `SELECT * FROM ${tableName} WHERE email=?`,
-      [email]
-    );
-
-    if (existingUser.length > 0) {
-      throw new Error("Email already exists");
-    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = (await pool).execute(
       `INSERT INTO ${tableName} (name, email, password) VALUES ('${name}', '${email}', '${hashedPassword}')`
     );
-    const result = { name, email, password };
-    const token = generateToken(result);
-    return result, token;
+    const result = { name, email, hashedPassword };
+    const token = generateToken(newUser)
+    return {result,token};
   } catch (error) {
     throw new Error("Error signing up: " + error.message);
   }
@@ -55,9 +47,9 @@ const login = async (email, password, isAdmin) => {
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
     }
-    const token = generateToken(result);
     const user = { password, email };
-    return user, token;
+    const token = generateToken(user)
+    return {user,token};
   } catch (error) {
     throw new Error("Error logging in: " + error.message);
   }

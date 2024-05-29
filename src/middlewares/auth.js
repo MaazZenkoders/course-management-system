@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const secretKey = process.env.MY_SECRET_KEY;
+const secretKey = "mysecretkey";
 
 const generateToken = (user) => {
   const payload = {
@@ -21,7 +21,7 @@ const authorizeTeacher = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.MY_SECRET_KEY);
 
     if (!decoded.isAdmin) {
       return res
