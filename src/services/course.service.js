@@ -3,9 +3,9 @@ const { connectToDb } = require("../utils/db");
 const createCourse = async (name, description) => {
   const pool = await connectToDb();
   try {
-    const [result] = (await pool).execute(
-      `INSERT INTO courses (name,description) VALUES ('${name}', '${description}'`
-    );
+    const [result] = await pool.execute(
+      'INSERT INTO courses (name, description) VALUES (?, ?)',
+      [name, description])
     const info = { name, description };
     return info;
   } catch (error) {
@@ -39,7 +39,7 @@ const updateCourse = async (course_id, name, description) => {
   }
 };
 
-const deleteCourse = async (course_id) => {
+const deleteCourse = async (course_id,name) => {
   const pool = await connectToDb();
   try {
     const [result] = await pool.query(
@@ -49,7 +49,7 @@ const deleteCourse = async (course_id) => {
     if (result.affectedRows === 0) {
       throw new Error(`No course found with id ${course_id}`);
     }
-    return { message: `Course with id ${course_id} deleted successfully` };
+    return { message: `Course ${name} with id ${course_id} deleted successfully` };
   } catch (error) {
     throw new Error("Error deleting course: " + error.message);
   }

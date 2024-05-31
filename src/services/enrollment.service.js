@@ -2,18 +2,19 @@ const { connectToDb } = require("../utils/db");
 
 const createEnrollment = async (student_id, course_id) => {
   const pool = connectToDb();
+  const data = {student_id,course_id}
 
   if (!student_id || !course_id) {
     throw new Error("Student ID and Course ID are required");
   }
 
   try {
-    const [result] = (await pool).execute(
-      "INSERT INTO enrollments (student_id, course_id) VALUES (?, ?)",
+    const [result] = await pool.execute(
+      'INSERT INTO enrollments (student_id, course_id) VALUES (?, ?',
       [student_id, course_id]
     );
-
-    return { enrollmentId: result.insertId, student_id, course_id };
+    
+    return data;
   } catch (error) {
     throw new Error("Error creating enrollment: " + error.message);
   }

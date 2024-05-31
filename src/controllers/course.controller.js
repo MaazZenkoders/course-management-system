@@ -51,10 +51,12 @@ const updateById = async (req, res) => {
 
 const deleteById = async (req, res) => {
   const student_id = req.params.id;
+  const name = req.body
   try {
     const deletedCourse = await courseService.deleteCourse(student_id);
     res.status(202).json({
       message: "Course deleted successfully",
+      data : {name,student_id}
     });
   } catch (error) {
     res.status(500).json({
