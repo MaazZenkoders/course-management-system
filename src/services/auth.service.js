@@ -2,11 +2,11 @@ const { generateToken } = require("../middlewares/auth");
 const bcrypt = require("bcrypt");
 const { connectToDb } = require("../utils/db");
 
-const signup = async (name, email, password, isAdmin) => {
-  const tableName = isAdmin ? "teachers" : "students";
+const signup = async (name, email, password, role) => {
+  const tableName = role === "admin" ? "teachers" : "students";
   const pool = connectToDb();
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !role) {
     return null;
   }
   try {
@@ -14,7 +14,7 @@ const signup = async (name, email, password, isAdmin) => {
     const newUser = (await pool).execute(
       `INSERT INTO ${tableName} (name, email, password) VALUES ('${name}', '${email}', '${hashedPassword}')`
     );
-    const result = { name, email, hashedPassword };
+    const result = { name, email, hashedPassword, role };
     const token = generateToken(newUser);
     return { result, token };
   } catch (error) {
@@ -22,16 +22,16 @@ const signup = async (name, email, password, isAdmin) => {
   }
 };
 
-const login = async (email, password, isAdmin) => {
-  const tableName = isAdmin ? "teachers" : "students";
+const login = async (email, password, role) => {
+  const tableName = role === "admin" ? "teachers" : "students";
   const pool = connectToDb();
 
-  if (!email || !password) {
+  if (!email || !password || !role) {
     throw new Error("Email and password are required");
   }
 
   try {
-    const [rows] = (await pool).query(
+    const [rows] = await pool.query(
       `SELECT * FROM ${tableName} WHERE email = ?`,
       [email]
     );

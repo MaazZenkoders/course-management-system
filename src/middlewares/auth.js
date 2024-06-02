@@ -6,34 +6,28 @@ const generateToken = (user) => {
     user: {
       id: user.id,
       email: user.email,
-      isAdmin : user.isAdmin
+      role: user.role,
     },
   };
   return jwt.sign(payload, secretKey, { expiresIn: "1h" });
 };
 
-const authorizeTeacher = (req, res, next) => {
-  
-  const token = req.headers.authorization?.split(" ")[1];
+const verifyToken = (req, res, next) => {
+  const token = req.header("Authorization");
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
 
-  if (!token) {
-    return res.status(401).json({ message: "Authorization token required" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.MY_SECRET_KEY);
-
-    if (!decoded.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can create courses" });
-    }
-
-    req.user = decoded;
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid token" });
+    req.user = user;
     next();
-  } catch (error) {
-    return res.status(403).json({ message: "Invalid or expired token" });
-  }
+  });
 };
 
-module.exports = { generateToken, authorizeTeacher };
+const authorizeTeacher = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    return next();
+  }
+  res.status(403).json({ message: "Admin access required" });
+};
+
+module.exports = { generateToken, authorizeTeacher, verifyToken };

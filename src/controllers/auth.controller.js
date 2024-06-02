@@ -1,8 +1,8 @@
 const authService = require("../services/auth.service");
 
 const signupHandler = async (req, res) => {
-  const { name, email, password, isAdmin } = req.body;
-  const newUser = await authService.signup(name, email, password, isAdmin);
+  const { name, email, password, role } = req.body;
+  const newUser = await authService.signup(name, email, password, role);
   if (newUser) {
     res.status(201).json({
       newUser: newUser,
@@ -14,8 +14,8 @@ const signupHandler = async (req, res) => {
 };
 
 const loginHandler = (req, res) => {
-  const { email, password, isAdmin } = req.body;
-  const user = authService.login(email, password, isAdmin);
+  const { email, password, role } = req.body;
+  const user = authService.login(email, password, role);
   if (user) {
     res.status(200).json({
       user: user,
