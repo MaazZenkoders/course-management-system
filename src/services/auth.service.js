@@ -15,8 +15,8 @@ const signup = async (name, email, password, isAdmin) => {
       `INSERT INTO ${tableName} (name, email, password) VALUES ('${name}', '${email}', '${hashedPassword}')`
     );
     const result = { name, email, hashedPassword };
-    const token = generateToken(newUser)
-    return {result,token};
+    const token = generateToken(newUser);
+    return { result, token };
   } catch (error) {
     throw new Error("Error signing up: " + error.message);
   }
@@ -31,7 +31,7 @@ const login = async (email, password, isAdmin) => {
   }
 
   try {
-    const [rows] = await pool.query(
+    const [rows] = (await pool).query(
       `SELECT * FROM ${tableName} WHERE email = ?`,
       [email]
     );
@@ -48,12 +48,11 @@ const login = async (email, password, isAdmin) => {
       throw new Error("Invalid email or password");
     }
     const user = { password, email };
-    const token = generateToken(user)
-    return {user,token};
+    const token = generateToken(user);
+    return { user, token };
   } catch (error) {
     throw new Error("Error logging in: " + error.message);
   }
 };
 
 module.exports = { login, signup };
-
