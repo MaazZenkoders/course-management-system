@@ -45,7 +45,9 @@ const deleteCourse = async (course_id,name) => {
     const [result] = await pool.query(
       "DELETE FROM courses WHERE course_id = ?",
       [course_id]
+      
     );
+    console.log(result)
     if (result.affectedRows === 0) {
       throw new Error(`No course found with id ${course_id}`);
     }

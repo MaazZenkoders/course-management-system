@@ -11,6 +11,17 @@ const connectToDb = async (query) => {
     queueLimit: 0,
   });
 
+
+  db.getConnection()
+    .then(connection => {
+      console.log("Database connected");
+      connection.release();
+    })
+    .catch(err => {
+      console.error("Error connecting to the database:", err);
+    });
+
+    
   if (db) {
     console.log("Database connected");
   }
